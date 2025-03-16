@@ -1,0 +1,26 @@
+{
+  "name": "@tdtarbo/react-alert",
+  "version": "1.0.0",
+  "scripts": {
+    "rollup": "rollup -c"
+  },
+  "keywords": [
+    "alert"
+  ],
+  "author": "Thilina Dilhan",
+  "license": "MIT",
+  "description": "React alert library",
+  "devDependencies": {
+    "@babel/preset-react": "^7.26.3",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "rollup": "^4.35.0",
+    "rollup-plugin-postcss": "^4.0.2"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ]
+}
