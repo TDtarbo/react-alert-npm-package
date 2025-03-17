@@ -14,10 +14,14 @@ A customizable, reusable alert system for React applications. This package provi
 
 <br>
 
+### See it in motion — **[**Live Demo**](https://tdtarbo.github.io/react-alert-demo/) is just a click away**
+
+<br>
+
 # Installation
 
 ```sh
-npm install your-alert-package
+npm i @tdtarbo/react-alert
 ```
 
 <br>
