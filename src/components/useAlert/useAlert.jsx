@@ -6,6 +6,12 @@ import { AlertContext } from "../AlertProvider/AlertProvider.jsx"
     const ERROR = "error";
     const SUCCESS = "success";
 
+    const ANIMATION_TYPES = {
+        scale: "scale",
+        slide: "slide",
+        drop: "drop"
+    }
+
     // Success Titles
     const TITLE_SUCCESS = {
 
@@ -31,7 +37,30 @@ import { AlertContext } from "../AlertProvider/AlertProvider.jsx"
     const generateAlert = (alertData) => {
     
         if(!alertData.type || !alertData.title) return null;
-    
+
+        if (alertData.type !== ERROR && alertData.type !== SUCCESS) {
+            console.error(
+                `Alert Error (Unexpected alert type):\n` +
+                `sendAlert({ type: "${alertData.type}" })\n\n` +
+                `Expected: { type: "success" } or { type: "error" }`
+            );
+        }
+
+
+        if (alertData.animation) {
+            const { type, duration } = alertData.animation;
+        
+            if (type && !ANIMATION_TYPES[type]) {
+                console.error(`Alert Error(Wrong Animation Type): \n\nExpected: alert.animation.scale, alert.animation.slide, alert.animation.drop`);
+                return;
+            }
+        
+            if (duration !== undefined && typeof duration !== "number") {
+                console.error(`Alert Error(Wrong Animation Duration): \n\nExpected: Number`);
+                return;
+            }
+        }
+        
         const alert = {
 
             id: Date.now(),
@@ -42,6 +71,10 @@ import { AlertContext } from "../AlertProvider/AlertProvider.jsx"
                 title: alertData.btn.title || null,
                 optionalAction: alertData.btn.optionalAction || null,
                 mandatoryAction: alertData.btn.mandatoryAction || null
+            } : null,
+            animation: alertData.animation ? { 
+                type: alertData.animation.type || null, 
+                duration: alertData.animation.duration || null, 
             } : null
         };
     
@@ -65,6 +98,8 @@ const useAlert = () => {
             success: {...TITLE_SUCCESS},
             error: {...TITLE_ERRORS}
         },
+
+        animation: {...ANIMATION_TYPES}
         
     };
 
@@ -76,7 +111,6 @@ const useAlert = () => {
         const generatedAlert = generateAlert(alertData)
 
         if(!generatedAlert) return console.error(`Alert Error(Missing values): \n{type: ${alertData.type}, title: ${alertData.title}}`);
-        console.log(generatedAlert);
         
         displayAlert(generatedAlert)
 

@@ -1,35 +1,72 @@
-import React from "react";
-import { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import Alert from "../Alert/Alert.jsx";
-import "../styles.css"
+import "../styles.css";
 
 const AlertContext = createContext({});
 
 const AlertProvider = ({ children }) => {
-  const [alert, setAlert] = useState([]);
+  const [alerts, setAlerts] = useState([]); // Renamed 'alert' to 'alerts' for clarity
+
+  const [pendingAnimations, setPendingAnimations] = useState(0);
+  const [pendingAlertsIds, setPendingAlertsIds] = useState([]);
+
+  useEffect(() => {
+    const wrappers = document.querySelectorAll(".alert-wrapper");
+    wrappers.forEach((wrapper) => {
+      const alert = wrapper.querySelector(".custom-alert");
+      if (alert) {
+        wrapper.style.height = `${alert.clientHeight}px`;
+      }
+    });
+
+  }, [alerts]);
 
   const displayAlert = (newAlert) => {
-    setAlert(previousAlerts => {return [ newAlert,...previousAlerts]})
-  }
+    setAlerts((previousAlerts) => [newAlert, ...previousAlerts]);
+  };
 
   const removeAlert = (id) => {
-      setAlert((prevData) => prevData.filter((alert) => alert.id !== id));
-  }
+
+    const result = alerts.find(item => item.id === id);
+
+
+    const wrapper = document.getElementById(`${id}`);
+    wrapper.style.height = `0px`;
+    wrapper.style.margin = `0px`;
+
+    setPendingAlertsIds((prev) => [...prev, id]);
+    setPendingAnimations((p) => p + 1);
+
+    setTimeout(() => {
+      setPendingAnimations((p) => p - 1);
+    }, result?.animation?.delay || 300);
+  };
+
+  useEffect(() => {
+    if (pendingAnimations === 0 && pendingAlertsIds.length > 0) {
+      setAlerts((prevData) => {
+        return prevData.filter((alert) => !pendingAlertsIds.includes(alert.id));
+      });
+
+      setPendingAlertsIds([]);
+    }
+  }, [pendingAnimations]);
 
   return (
     <AlertContext.Provider value={{ displayAlert, removeAlert }}>
-      {
-        !alert.length ? null: <div className="alert-container">
-        {alert.map((data, key) => (
-          <Alert key={data.id} data={{ ...data, key }} />
-        ))}
-      </div>
-      }
-      
+      {alerts.length ? (
+        <div className="alert-container">
+          {alerts.map((data) => (
+            <div className="alert-wrapper" id={data.id} key={data.id}>
+              <Alert data={data} />
+            </div>
+          ))}
+        </div>
+      ) : null}
       {children}
     </AlertContext.Provider>
   );
 };
 
-export default AlertProvider
+export default AlertProvider;
 export { AlertContext };
