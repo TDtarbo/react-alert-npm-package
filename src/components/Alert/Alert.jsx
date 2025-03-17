@@ -15,19 +15,24 @@ const Alert = ({ data }) => {
   const animationType = animation?.type || "scale";
   const duration = animation?.duration || .3;
 
+
   useEffect(() => {
     
+    const wrapper = document.getElementById(`${id}`);
+    wrapper.style.transition = `all ${animationType == "slide" ? duration - .12 : duration || .3}s ease-out`;
+
     ref.current.classList.add(`${animationType}-initial`);
     ref.current.style.transition= `all ${duration}s ease-in-out`; 
 
     const timer = setTimeout(() => {
       ref.current.classList.add(`${animationType}`);
+
+
     }, 10);
     return () => clearTimeout(timer);
   }, []);
 
   const closeAlert = () => {
-
     ref.current.classList.remove(`${animationType}`);
     removeAlert(id)
   };

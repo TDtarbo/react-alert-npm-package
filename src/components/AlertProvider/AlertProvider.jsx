@@ -15,7 +15,7 @@ const AlertProvider = ({ children }) => {
     wrappers.forEach((wrapper) => {
       const alert = wrapper.querySelector(".custom-alert");
       if (alert) {
-        wrapper.style.height = `${alert.clientHeight}px`;
+        wrapper.style.height = `${alert.clientHeight + 10}px`;
       }
     });
 
@@ -29,17 +29,18 @@ const AlertProvider = ({ children }) => {
 
     const result = alerts.find(item => item.id === id);
 
-
     const wrapper = document.getElementById(`${id}`);
+    
     wrapper.style.height = `0px`;
     wrapper.style.margin = `0px`;
 
     setPendingAlertsIds((prev) => [...prev, id]);
     setPendingAnimations((p) => p + 1);
 
+    
     setTimeout(() => {
       setPendingAnimations((p) => p - 1);
-    }, result?.animation?.delay || 300);
+    }, result?.animation?.duration * 1000 || 300);
   };
 
   useEffect(() => {
