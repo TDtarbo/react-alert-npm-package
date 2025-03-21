@@ -132,8 +132,8 @@
 }
 .button-indigo-outline:hover { background-color: #695edf21; }
 
-.title { font-size: 1.2rem; font-weight: 700; margin:0; margin-right: 2rem; text-align: left; word-break: break-word; }
-.description { font-size: 1rem; margin-top: 0.5rem; margin-right: 2rem; text-align: left; word-break: break-word;}
+.title { font-size: 1rem; font-weight: 700; margin:0; margin-right: 2rem; text-align: left; word-break: break-word; }
+.description { font-size: .9rem; margin-top: 0.5rem; margin-right: 2rem; text-align: left; word-break: break-word;}
 .svg { flex-shrink: 0; height: 1.5rem; width: 1.5rem; margin-top: 0.2rem; }
 .svg-error { stroke: #f87171; }
 .svg-success { stroke: #32b887; }
