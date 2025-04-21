@@ -1,14 +1,31 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import ReactDOM from "react-dom";
 import Alert from "../Alert/Alert.jsx";
 import "../styles.css";
 
 const AlertContext = createContext({});
 
 const AlertProvider = ({ children }) => {
-  const [alerts, setAlerts] = useState([]); // Renamed 'alert' to 'alerts' for clarity
-
+  const [alerts, setAlerts] = useState([]);
   const [pendingAnimations, setPendingAnimations] = useState(0);
   const [pendingAlertsIds, setPendingAlertsIds] = useState([]);
+
+  const portalRef = useRef(null);
+
+  useEffect(() => {
+    let portalRoot = document.getElementById("alert-portal-root");
+    if (!portalRoot) {
+      portalRoot = document.createElement("div");
+      portalRoot.id = "alert-portal-root";
+      document.body.appendChild(portalRoot);
+    }
+    portalRef.current = portalRoot;
+  }, []);
 
   useEffect(() => {
     const wrappers = document.querySelectorAll(".alert-wrapper");
@@ -18,7 +35,6 @@ const AlertProvider = ({ children }) => {
         wrapper.style.height = `${alert.clientHeight + 10}px`;
       }
     });
-
   }, [alerts]);
 
   const displayAlert = (newAlert) => {
@@ -26,18 +42,16 @@ const AlertProvider = ({ children }) => {
   };
 
   const removeAlert = (id) => {
-
-    const result = alerts.find(item => item.id === id);
-
+    const result = alerts.find((item) => item.id === id);
     const wrapper = document.getElementById(`${id}`);
-    
-    wrapper.style.height = `0px`;
-    wrapper.style.margin = `0px`;
+    if (wrapper) {
+      wrapper.style.height = `0px`;
+      wrapper.style.margin = `0px`;
+    }
 
     setPendingAlertsIds((prev) => [...prev, id]);
     setPendingAnimations((p) => p + 1);
 
-    
     setTimeout(() => {
       setPendingAnimations((p) => p - 1);
     }, result?.animation?.duration * 1000 || 300);
@@ -45,25 +59,26 @@ const AlertProvider = ({ children }) => {
 
   useEffect(() => {
     if (pendingAnimations === 0 && pendingAlertsIds.length > 0) {
-      setAlerts((prevData) => {
-        return prevData.filter((alert) => !pendingAlertsIds.includes(alert.id));
-      });
-
+      setAlerts((prevData) =>
+        prevData.filter((alert) => !pendingAlertsIds.includes(alert.id))
+      );
       setPendingAlertsIds([]);
     }
   }, [pendingAnimations]);
 
+  const alertPortalContent = alerts.length ? (
+    <div className="alert-container">
+      {alerts.map((data) => (
+        <div className="alert-wrapper" id={data.id} key={data.id}>
+          <Alert data={data} />
+        </div>
+      ))}
+    </div>
+  ) : null;
+
   return (
     <AlertContext.Provider value={{ displayAlert, removeAlert }}>
-      {alerts.length ? (
-        <div className="alert-container">
-          {alerts.map((data) => (
-            <div className="alert-wrapper" id={data.id} key={data.id}>
-              <Alert data={data} />
-            </div>
-          ))}
-        </div>
-      ) : null}
+      {portalRef.current && ReactDOM.createPortal(alertPortalContent, portalRef.current)}
       {children}
     </AlertContext.Provider>
   );

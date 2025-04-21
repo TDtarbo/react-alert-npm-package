@@ -42,7 +42,7 @@ const Alert = ({ data }) => {
     if (!btn) {
       const timer = setTimeout(() => {
         closeAlert();
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [btn]);
